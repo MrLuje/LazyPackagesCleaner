@@ -62,12 +62,12 @@ namespace MrLuje.LazyPackagesCleaner
         /// </summary>
         protected override void Initialize()
         {
-            Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
             var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if ( null != mcs )
+            if (null != mcs)
             {
                 // Create the command for the menu item.
                 var menuCommandDeleteVersionned = new CommandID(GuidList.guidLazyPackagesCleanerCmdSet, (int)PkgCmdIDList.cmdDeleteNonVersionned);
@@ -116,7 +116,7 @@ namespace MrLuje.LazyPackagesCleaner
             var packageFolder = Utils.FindPackageFolder(nugetConfigPath, solutionFolder);
 
             DeleteNonVersionnedFolders(packageFolder);
-            
+
         }
 
         private void MenuItemCallback_DeleteAll(object sender, EventArgs e)
@@ -187,11 +187,7 @@ namespace MrLuje.LazyPackagesCleaner
             {
                 try
                 {
-                    if (Directory.Exists(folder))
-                    {
-                        Utils.RemoveReadOnly(folder);
-                        Directory.Delete(folder, recursive: true);
-                    }
+                    Utils.DeleteFolder(folder);
                 }
                 catch (DirectoryNotFoundException) { }
 
@@ -232,11 +228,7 @@ namespace MrLuje.LazyPackagesCleaner
             {
                 try
                 {
-                    if (Directory.Exists(folder))
-                    {
-                        Utils.RemoveReadOnly(folder);
-                        Directory.Delete(folder, recursive: true);
-                    }
+                    Utils.DeleteFolder(folder);
                 }
                 catch (DirectoryNotFoundException) { }
 

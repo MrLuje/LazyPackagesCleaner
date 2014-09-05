@@ -10,17 +10,33 @@ namespace MrLuje.LazyPackagesCleaner
 {
     public static class Utils
     {
-        public static void RemoveReadOnly(string folderPath)
+        public static void DeleteFolder(string folderPath)
         {
-            Array.ForEach(Directory.GetFiles(folderPath), f =>
-            {
-                File.SetAttributes(Path.GetFullPath(f), FileAttributes.Normal);
-            });
+            if (Directory.Exists(folderPath)) return;
 
-            Array.ForEach(Directory.GetDirectories(folderPath), d =>
+            var directory = new DirectoryInfo(folderPath) { Attributes = FileAttributes.Normal };
+
+            foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
             {
-                RemoveReadOnly(d);
-            });
+                info.Attributes = FileAttributes.Normal;
+            }
+
+            Array.ForEach(Directory.GetFiles(folderPath), File.Delete);
+
+            Array.ForEach(Directory.GetDirectories(folderPath), DeleteFolder);
+
+            try
+            {
+                Directory.Delete(folderPath);
+            }
+            catch
+            {
+            }
+
+            if (Directory.Exists(folderPath))
+            {
+                Directory.Delete(folderPath, recursive: true);
+            }
         }
 
         public static string FindPackageFolder(string nugetConfigPath, string solutionFolder)
