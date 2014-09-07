@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="4e4e3df2-3bbf-4d3b-8d87-6452f76fb6da" Version="1.2" Language="en-US" Publisher="MrLuje" />
+    <Identity Id="4e4e3df2-3bbf-4d3b-8d87-6452f76fb6da" Version="1.3" Language="en-US" Publisher="MrLuje" />
     <DisplayName>LazyPackagesCleaner</DisplayName>
     <Description>Easily cleanup your nuget packages folder through Visual Studio commands</Description>
   </Metadata>

@@ -155,6 +155,7 @@ namespace MrLuje.LazyPackagesCleaner
         private void MenuItemCallback_DeleteVersionned(object sender, EventArgs e)
         {
             var dte = GetService(typeof(SDTE)) as DTE;
+            if (!dte.Solution.IsOpen) return;
 
             var nugetConfigPath = String.Empty;
             var nugetProj = dte.Solution.Projects.OfType<Project>().FirstOrDefault(p => p.Name.Contains(".nuget"));
@@ -174,6 +175,7 @@ namespace MrLuje.LazyPackagesCleaner
         private void MenuItemCallback_DeleteAll(object sender, EventArgs e)
         {
             var dte = GetService(typeof(SDTE)) as DTE;
+            if (!dte.Solution.IsOpen) return;
 
             var nugetConfigPath = String.Empty;
             var nugetProj = dte.Solution.Projects.OfType<Project>().FirstOrDefault(p => p.Name.Contains(".nuget"));
@@ -192,6 +194,7 @@ namespace MrLuje.LazyPackagesCleaner
         private void MenuItemCallback_OpenPackages(object sender, EventArgs e)
         {
             var dte = GetService(typeof(SDTE)) as DTE;
+            if (!dte.Solution.IsOpen) return;
 
             var nugetConfigPath = String.Empty;
             var nugetProj = dte.Solution.Projects.OfType<Project>().FirstOrDefault(p => p.Name.Contains(".nuget"));
