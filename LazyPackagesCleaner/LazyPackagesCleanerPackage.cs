@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -6,12 +7,14 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using EnvDTE;
 using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using MrLuje.LazyPackagesCleaner.Properties;
 
 namespace MrLuje.LazyPackagesCleaner
 {
@@ -50,7 +53,7 @@ namespace MrLuje.LazyPackagesCleaner
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
-
+        private SolutionBuildDetector solutionBuildDetector;
 
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
@@ -80,18 +83,65 @@ namespace MrLuje.LazyPackagesCleaner
                 var menuCommandOpenPackages = new CommandID(GuidList.guidLazyPackagesCleanerCmdSet, (int)PkgCmdIDList.cmdOpenPackages);
                 mcs.AddCommand(new MenuCommand(MenuItemCallback_OpenPackages, menuCommandOpenPackages));
             }
+
+            solutionBuildDetector = new SolutionBuildDetector();
+            solutionBuildDetector.FirstBuild += solutionBuildDetector_FirstBuild;
+            var dte = GetService(typeof(SDTE)) as DTE;
+            dte.Events.BuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
+            dte.Events.SolutionEvents.BeforeClosing += SolutionEvents_BeforeClosing;
+            dte.Events.SolutionEvents.Opened += SolutionEvents_Opened;
         }
-        #endregion
 
-
-        private IVsStatusbar bar;
-        private IVsStatusbar StatusBar
+        void SolutionEvents_Opened()
         {
-            get
+            var dte = GetService(typeof(SDTE)) as DTE;
+            if(Settings.Default.DebugMode)
+                MessageBox.Show("Opened: " + dte.Solution.FullName);
+            solutionBuildDetector.SolutionLoad(dte.Solution.FullName);
+        }
+
+        void SolutionEvents_BeforeClosing()
+        {
+            var dte = GetService(typeof(SDTE)) as DTE;
+            solutionBuildDetector.SolutionClose(dte.Solution.FullName);
+        }
+
+        void BuildEvents_OnBuildBegin(vsBuildScope Scope, vsBuildAction Action)
+        {
+            var dte = GetService(typeof(SDTE)) as DTE;
+
+            if (Action == vsBuildAction.vsBuildActionBuild ||
+                Action == vsBuildAction.vsBuildActionRebuildAll)
             {
-                return bar ?? (bar = GetService(typeof(SVsStatusbar)) as IVsStatusbar);
+                if (Settings.Default.DebugMode)
+                    MessageBox.Show("Building: " + dte.Solution.FullName);
+
+                solutionBuildDetector.SolutionBuild(dte.Solution.FullName);
+            }
+            else if (Action == vsBuildAction.vsBuildActionClean && Settings.Default.EnableDeleteOnClean)
+            {
+                var solutionFolder = Path.GetDirectoryName(dte.Solution.FullName);
+                var packageFolder = Utils.FindPackageFolder(String.Empty, solutionFolder);
+
+                DeleteNonVersionnedFolders(packageFolder);
             }
         }
+
+        void solutionBuildDetector_FirstBuild()
+        {
+            if (Settings.Default.DebugMode)
+                MessageBox.Show("First build !");
+
+            if (!Settings.Default.EnableDeleteOnFirstBuild) return;
+
+            var dte = GetService(typeof(SDTE)) as DTE;
+            var solutionFolder = Path.GetDirectoryName(dte.Solution.FullName);
+            var packageFolder = Utils.FindPackageFolder(String.Empty, solutionFolder);
+
+            DeleteNonVersionnedFolders(packageFolder);
+        }
+
+        #endregion
 
         #region Menu item callbacks
 
@@ -159,6 +209,8 @@ namespace MrLuje.LazyPackagesCleaner
 
         #endregion
 
+        #region Visual stuffs
+
         void InitVisualDeletion(string startText)
         {
             StatusBar.IsFrozen(out frozenState);
@@ -186,9 +238,22 @@ namespace MrLuje.LazyPackagesCleaner
             StatusBar.FreezeOutput(0);
         }
 
+        private IVsStatusbar bar;
+        private IVsStatusbar StatusBar
+        {
+            get
+            {
+                return bar ?? (bar = GetService(typeof(SVsStatusbar)) as IVsStatusbar);
+            }
+        }
+
         object icon = (short)Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Save;
         int frozenState;
         uint cookie = 1;
+
+        #endregion
+
+        #region Delete methods
 
         private void DeleteNonVersionnedFolders(string packageFolder)
         {
@@ -223,5 +288,7 @@ namespace MrLuje.LazyPackagesCleaner
 
             EndVisualDeletion(Resources.DeletionAllFoldersEnd);
         }
+
+        #endregion
     }
 }

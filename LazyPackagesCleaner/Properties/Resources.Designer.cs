@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MrLuje.LazyPackagesCleaner {
+namespace MrLuje.LazyPackagesCleaner.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace MrLuje.LazyPackagesCleaner {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MrLuje.LazyPackagesCleaner.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MrLuje.LazyPackagesCleaner.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
