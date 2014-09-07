@@ -66,6 +66,9 @@
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <ButtonText>Delete non-versionned packages</ButtonText>
+          <CommandName>X Non-Versionned</CommandName>
+          <LocCanonicalName>lpc.DeleteNonVersionnedFolders</LocCanonicalName>
+          <ToolTipText>Delete non-versionned packages</ToolTipText>
         </Strings>
       </Button>
       <Button guid="guidLazyPackagesCleanerCmdSet" id="cmdDeleteAll" priority="0x0101" type="Button">
@@ -73,6 +76,9 @@
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <ButtonText>Delete all packages</ButtonText>
+          <CommandName>X All</CommandName>
+          <LocCanonicalName>lpc.DeleteAllFolders</LocCanonicalName>
+          <ToolTipText>Delete all packages</ToolTipText>
         </Strings>
       </Button>
       <Button guid="guidLazyPackagesCleanerCmdSet" id="cmdOpenPackages" priority="0x0102" type="Button">
@@ -80,6 +86,9 @@
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <ButtonText>Open package folder</ButtonText>
+          <CommandName>Open packages</CommandName>
+          <LocCanonicalName>lpc.OpenPackagesFolder</LocCanonicalName>
+          <ToolTipText>Open package folder</ToolTipText>
         </Strings>
       </Button>
 

@@ -10,35 +10,6 @@ namespace MrLuje.LazyPackagesCleaner
 {
     public static class Utils
     {
-        public static void DeleteFolder(string folderPath)
-        {
-            if (Directory.Exists(folderPath)) return;
-
-            var directory = new DirectoryInfo(folderPath) { Attributes = FileAttributes.Normal };
-
-            foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
-            {
-                info.Attributes = FileAttributes.Normal;
-            }
-
-            Array.ForEach(Directory.GetFiles(folderPath), File.Delete);
-
-            Array.ForEach(Directory.GetDirectories(folderPath), DeleteFolder);
-
-            try
-            {
-                Directory.Delete(folderPath);
-            }
-            catch
-            {
-            }
-
-            if (Directory.Exists(folderPath))
-            {
-                Directory.Delete(folderPath, recursive: true);
-            }
-        }
-
         public static string FindPackageFolder(string nugetConfigPath, string solutionFolder)
         {
             if (!String.IsNullOrEmpty(nugetConfigPath))

@@ -159,6 +159,37 @@ namespace MrLuje.LazyPackagesCleaner
 
         #endregion
 
+        void InitVisualDeletion(string startText)
+        {
+            StatusBar.IsFrozen(out frozenState);
+
+            if (frozenState == 0)
+            {
+                StatusBar.SetText(startText);
+
+                StatusBar.Animation(1, ref icon);
+            }
+        }
+
+        void ProgressVisualDeletion(uint current, uint total)
+        {
+            if (frozenState == 0)
+                StatusBar.Progress(ref cookie, 1, "", current, total);
+        }
+
+        void EndVisualDeletion(string endText)
+        {
+            // Clear the progress bar.
+            StatusBar.Progress(ref cookie, 0, "", 0, 0);
+            StatusBar.Animation(0, ref icon);
+            StatusBar.SetText(endText);
+            StatusBar.FreezeOutput(0);
+        }
+
+        object icon = (short)Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Save;
+        int frozenState;
+        uint cookie = 1;
+
         private void DeleteNonVersionnedFolders(string packageFolder)
         {
             if (!Utils.CheckForRepositoryConfig(packageFolder)) return;
@@ -168,78 +199,29 @@ namespace MrLuje.LazyPackagesCleaner
                           where !regex.IsMatch(dir)
                           select dir;
 
-            int frozenState;
-            uint prog = 0;
-            StatusBar.IsFrozen(out frozenState);
-            int foldersCount = folders.Count();
-            if (frozenState == 0)
-            {
-                StatusBar.SetText("Deleting non-versionned folders...");
-                StatusBar.Progress(ref prog, 0, "", 0, Convert.ToUInt32(foldersCount));
-            }
+            InitVisualDeletion(Resources.DeletionNonVersionnedFoldersStart);
 
-            object icon = (short)Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Save;
-            StatusBar.Animation(1, ref icon);
+            var folderDeletor = new FolderDeletor();
+            folderDeletor.DeletionProgress += ProgressVisualDeletion;
+            folderDeletor.DeleteFolders(folders);
 
-            uint cookie = 1;
-            uint progress = 1;
-            foreach (var folder in folders)
-            {
-                try
-                {
-                    Utils.DeleteFolder(folder);
-                }
-                catch (DirectoryNotFoundException) { }
-
-                if (frozenState == 0)
-                    StatusBar.Progress(ref cookie, 1, "", progress++, Convert.ToUInt32(foldersCount));
-            }
-
-            // Clear the progress bar.
-            StatusBar.Progress(ref cookie, 0, "", 0, 0);
-            StatusBar.Animation(0, ref icon);
-            StatusBar.FreezeOutput(0);
+            EndVisualDeletion(Resources.DeletionNonVersionnedFoldersEnd);
         }
 
         private void DeleteAllFolder(string packageFolder)
         {
             if (!Utils.CheckForRepositoryConfig(packageFolder)) return;
 
-            var regex = new Regex(@"\d+", RegexOptions.IgnoreCase);
             var folders = from dir in Directory.EnumerateDirectories(packageFolder)
                           select dir;
 
-            int frozenState;
-            uint prog = 0;
-            StatusBar.IsFrozen(out frozenState);
-            int foldersCount = folders.Count();
-            if (frozenState == 0)
-            {
-                StatusBar.SetText("Deleting non-versionned folders...");
-                StatusBar.Progress(ref prog, 0, "", 0, Convert.ToUInt32(foldersCount));
-            }
+            InitVisualDeletion(Resources.DeletionAllFoldersStart);
 
-            object icon = (short)Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Save;
-            StatusBar.Animation(1, ref icon);
+            var folderDeletor = new FolderDeletor();
+            folderDeletor.DeletionProgress += ProgressVisualDeletion;
+            folderDeletor.DeleteFolders(folders);
 
-            uint cookie = 1;
-            uint progress = 1;
-            foreach (var folder in folders)
-            {
-                try
-                {
-                    Utils.DeleteFolder(folder);
-                }
-                catch (DirectoryNotFoundException) { }
-
-                if (frozenState == 0)
-                    StatusBar.Progress(ref cookie, 1, "", progress++, Convert.ToUInt32(foldersCount));
-            }
-
-            // Clear the progress bar.
-            StatusBar.Progress(ref cookie, 0, "", 0, 0);
-            StatusBar.Animation(0, ref icon);
-            StatusBar.FreezeOutput(0);
+            EndVisualDeletion(Resources.DeletionAllFoldersEnd);
         }
     }
 }
