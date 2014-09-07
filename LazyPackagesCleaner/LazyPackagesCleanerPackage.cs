@@ -14,6 +14,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using MrLuje.LazyPackagesCleaner.GUI;
 using MrLuje.LazyPackagesCleaner.Properties;
 
 namespace MrLuje.LazyPackagesCleaner
@@ -39,6 +40,7 @@ namespace MrLuje.LazyPackagesCleaner
     [Guid(GuidList.guidLazyPackagesCleanerPkgString)]
     // Only load the package if there is a solution loaded
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string)]
+    [ProvideOptionPage(typeof(SettingsTool), "Lazy Packages Cleaner", "General", 101, 106, true)]
     public sealed class LazyPackagesCleanerPackage : Package
     {
         /// <summary>

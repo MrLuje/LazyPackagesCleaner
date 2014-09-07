@@ -25,7 +25,7 @@ namespace MrLuje.LazyPackagesCleaner.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool EnableDeleteOnFirstBuild {
             get {
                 return ((bool)(this["EnableDeleteOnFirstBuild"]));
@@ -37,7 +37,7 @@ namespace MrLuje.LazyPackagesCleaner.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool EnableDeleteOnClean {
             get {
                 return ((bool)(this["EnableDeleteOnClean"]));
