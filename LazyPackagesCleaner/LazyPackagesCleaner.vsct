@@ -63,7 +63,7 @@
 
       <Button guid="guidLazyPackagesCleanerCmdSet" id="cmdDeleteNonVersionned" priority="0x0100" type="Button">
         <Parent guid="guidLazyPackagesCleanerCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+        <Icon guid="guidImages3" id="bmpDelete" />
         <Strings>
           <ButtonText>Delete non-versionned packages</ButtonText>
           <CommandName>X Non-Versionned</CommandName>
@@ -73,7 +73,7 @@
       </Button>
       <Button guid="guidLazyPackagesCleanerCmdSet" id="cmdDeleteAll" priority="0x0101" type="Button">
         <Parent guid="guidLazyPackagesCleanerCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+        <Icon guid="guidImages3" id="bmpDelete" />
         <Strings>
           <ButtonText>Delete all packages</ButtonText>
           <CommandName>X All</CommandName>
@@ -102,6 +102,7 @@
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImages" href="Resources\Images.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>
       <Bitmap guid="guidImages2" href="Resources\Open_6529.png" usedList="bmpOpen"/>
+      <Bitmap guid="guidImages3" href="Resources\DeleteFolder.png" usedList="bmpDelete"/>
       
     </Bitmaps>
  
@@ -136,6 +137,9 @@
     </GuidSymbol>
     <GuidSymbol name="guidImages2" value="{b8ba0b3c-2fca-4a93-9fda-70276a399b8f}" >
       <IDSymbol name="bmpOpen" value="1" />
+    </GuidSymbol>
+    <GuidSymbol name="guidImages3" value="{b8ba0b3d-2fca-4a93-9fda-70276a399b8f}" >
+      <IDSymbol name="bmpDelete" value="1" />
     </GuidSymbol>
   </Symbols>
 

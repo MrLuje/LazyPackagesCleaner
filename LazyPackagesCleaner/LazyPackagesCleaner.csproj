@@ -184,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Open_6529.png" />
+    <Resource Include="Resources\DeleteFolder.png" />
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <PropertyGroup>
