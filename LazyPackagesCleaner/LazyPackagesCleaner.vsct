@@ -81,7 +81,7 @@
           <ToolTipText>Delete all packages</ToolTipText>
         </Strings>
       </Button>
-      <Button guid="guidLazyPackagesCleanerCmdSet" id="cmdOpenPackages" priority="0x0102" type="Button">
+      <Button guid="guidLazyPackagesCleanerCmdSet" id="cmdOpenPackages" priority="0x0102" type="Button">  
         <Parent guid="guidLazyPackagesCleanerCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages2" id="bmpOpen" />
         <Strings>
@@ -91,9 +91,6 @@
           <ToolTipText>Open package folder</ToolTipText>
         </Strings>
       </Button>
-
-
-
     </Buttons>
    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -109,10 +106,10 @@
     </Bitmaps>
  
   </Commands>
-
-  <!--<KeyBindings>
-    <KeyBinding guid="guidLazyPackagesCleanerCmdSet" id="cmdOpenPackages" editor="guidVSStd97" key1="1" mod1="CONTROL"/>
-  </KeyBindings>-->
+  
+  <KeyBindings>
+    <KeyBinding guid="guidLazyPackagesCleanerCmdSet" id="cmdOpenPackages" editor="guidVSStd97" key1="K" mod1="CONTROL" key2="P" mod2="CONTROL ALT"/>
+  </KeyBindings>
   
   <Symbols>
     <!-- This is the package guid. -->
