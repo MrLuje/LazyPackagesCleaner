@@ -58,5 +58,65 @@ namespace MrLuje.LazyPackagesCleaner.Properties {
                 this["DebugMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("(.+)(CompanyName)([\\.\\w]+)(\\.[0-9]+){3}(\\\\lib\\\\.+\\.dll\\</HintPath\\>)")]
+        public string RegexProjectReferencePattern {
+            get {
+                return ((string)(this["RegexProjectReferencePattern"]));
+            }
+            set {
+                this["RegexProjectReferencePattern"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("$1$2$3$5")]
+        public string RegexProjectReferenceReplace {
+            get {
+                return ((string)(this["RegexProjectReferenceReplace"]));
+            }
+            set {
+                this["RegexProjectReferenceReplace"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("(id=\")(?<name>[^\"]*)(\" version=\")(?<version>[^\"]*)(\")")]
+        public string RegexPackageConfigPackagePattern {
+            get {
+                return ((string)(this["RegexPackageConfigPackagePattern"]));
+            }
+            set {
+                this["RegexPackageConfigPackagePattern"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("(<reference include=\")(CompanyName)[^,]*)[^\"]*\"")]
+        public string RegexProjectReferenceProcessPattern {
+            get {
+                return ((string)(this["RegexProjectReferenceProcessPattern"]));
+            }
+            set {
+                this["RegexProjectReferenceProcessPattern"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("$1$2\"")]
+        public string RegexProjectReferenceProcessReplace {
+            get {
+                return ((string)(this["RegexProjectReferenceProcessReplace"]));
+            }
+            set {
+                this["RegexProjectReferenceProcessReplace"] = value;
+            }
+        }
     }
 }

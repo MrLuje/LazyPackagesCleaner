@@ -9,12 +9,14 @@ using System.ComponentModel.Design;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using EnvDTE;
-using Microsoft.Win32;
+using EnvDTE80;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using MrLuje.LazyPackagesCleaner.GUI;
+using MrLuje.LazyPackagesCleaner.Model;
 using MrLuje.LazyPackagesCleaner.Properties;
 
 namespace MrLuje.LazyPackagesCleaner
@@ -57,8 +59,6 @@ namespace MrLuje.LazyPackagesCleaner
 
         private SolutionBuildDetector solutionBuildDetector;
 
-        /////////////////////////////////////////////////////////////////////////////
-        // Overridden Package Implementation
         #region Package Members
 
         /// <summary>
@@ -76,14 +76,27 @@ namespace MrLuje.LazyPackagesCleaner
             {
                 // Create the command for the menu item.
                 var menuCommandDeleteVersionned = new CommandID(GuidList.guidLazyPackagesCleanerCmdSet, (int)PkgCmdIDList.cmdDeleteNonVersionned);
-                var menuItem = new MenuCommand(MenuItemCallback_DeleteVersionned, menuCommandDeleteVersionned);
-                mcs.AddCommand(menuItem);
+                _menuCommandDeleteVersionned = new MenuCommand(MenuItemCallback_DeleteVersionned, menuCommandDeleteVersionned);
+                mcs.AddCommand(_menuCommandDeleteVersionned);
 
                 var menuCommandDeleteAll = new CommandID(GuidList.guidLazyPackagesCleanerCmdSet, (int)PkgCmdIDList.cmdDeleteAll);
-                mcs.AddCommand(new MenuCommand(MenuItemCallback_DeleteAll, menuCommandDeleteAll));
+                _menuCommandDeleteAll = new MenuCommand(MenuItemCallback_DeleteAll, menuCommandDeleteAll);
+                mcs.AddCommand(_menuCommandDeleteAll);
 
                 var menuCommandOpenPackages = new CommandID(GuidList.guidLazyPackagesCleanerCmdSet, (int)PkgCmdIDList.cmdOpenPackages);
-                mcs.AddCommand(new MenuCommand(MenuItemCallback_OpenPackages, menuCommandOpenPackages));
+                _menuCommandOpenPackages = new MenuCommand(MenuItemCallback_OpenPackages, menuCommandOpenPackages);
+                mcs.AddCommand(_menuCommandOpenPackages);
+
+                var menuCommandFixReferences = new CommandID(GuidList.guidLazyPackagesCleanerCmdSet, (int)PkgCmdIDList.cmdFixVersionnedReferences);
+                _menuCommandFixReferences = new MenuCommand(MenuItemCallback_FixReferences, menuCommandFixReferences);
+                mcs.AddCommand(_menuCommandFixReferences);
+
+                var menuCommandFixPackagesConfig = new CommandID(GuidList.guidLazyPackagesCleanerCmdSet, (int)PkgCmdIDList.cmdFixPackagesConfig);
+                _menuCommandFixPackagesConfig = new MenuCommand(MenuItemCallback_FixPackagesConfig, menuCommandFixPackagesConfig);
+                mcs.AddCommand(_menuCommandFixPackagesConfig);
+
+                _menuCommandFixPackagesConfig.Enabled = false;
+                _menuCommandFixReferences.Enabled = false;
             }
 
             solutionBuildDetector = new SolutionBuildDetector();
@@ -97,15 +110,21 @@ namespace MrLuje.LazyPackagesCleaner
         void SolutionEvents_Opened()
         {
             var dte = GetService(typeof(SDTE)) as DTE;
-            if(Settings.Default.DebugMode)
+            if (Settings.Default.DebugMode)
                 MessageBox.Show("Opened: " + dte.Solution.FullName);
             solutionBuildDetector.SolutionLoad(dte.Solution.FullName);
+
+            if (_menuCommandFixPackagesConfig != null) _menuCommandFixPackagesConfig.Enabled = true;
+            if (_menuCommandFixReferences != null) _menuCommandFixReferences.Enabled = true;
         }
 
         void SolutionEvents_BeforeClosing()
         {
             var dte = GetService(typeof(SDTE)) as DTE;
             solutionBuildDetector.SolutionClose(dte.Solution.FullName);
+
+            if (_menuCommandFixPackagesConfig != null) _menuCommandFixPackagesConfig.Enabled = false;
+            if (_menuCommandFixReferences != null) _menuCommandFixReferences.Enabled = false;
         }
 
         void BuildEvents_OnBuildBegin(vsBuildScope Scope, vsBuildAction Action)
@@ -212,6 +231,122 @@ namespace MrLuje.LazyPackagesCleaner
                 System.Diagnostics.Process.Start(packageFolder);
         }
 
+        private void MenuItemCallback_FixPackagesConfig(object sender, EventArgs e)
+        {
+            var dte = GetService(typeof(SDTE)) as DTE2;
+            if (!dte.Solution.IsOpen) return;
+
+            var packageConfigs = GetSolutionPackagesConfig(dte);
+            var referencedVersions = new PackageVersions();
+
+            foreach (var packageConfig in packageConfigs)
+            {
+                var content = File.ReadAllText(packageConfig);
+                foreach (Match match in regexPackageConfigContent.Matches(content))
+                {
+                    var name = match.Groups["name"].Value;
+                    var version = match.Groups["version"].Value;
+                    referencedVersions.AddVersion(name, version);
+                }
+            }
+
+            if (!referencedVersions.HasConflictingVersions())
+            {
+                MessageBox.Show("Nothing to fix", "Yeah !");
+                return;
+            }
+
+            var form = new ReferenceConflicts();
+            form.Show();
+            form.Confirmed += (result) =>
+            {
+                var fixCount = 0;
+                var targetCount = 0;
+                foreach (var packageConfig in packageConfigs)
+                {
+                    var content = File.ReadAllText(packageConfig);
+                    var orig = content;
+                    foreach (var tuple in result)
+                    {
+                        var wrongValues = referencedVersions.GetVersions(tuple.Item1)
+                                                            .Where(val => val != tuple.Item2);
+                        foreach (var wrongValue in wrongValues)
+                        {
+                            content = content.Replace(String.Format("id=\"{0}\" version=\"{1}\"", tuple.Item1, wrongValue),
+                                                      String.Format("id=\"{0}\" version=\"{1}\"", tuple.Item1, tuple.Item2));
+                        }
+                    }
+
+                    if (orig != content)
+                    {
+                        targetCount++;
+
+                        // Checkout file if currently mapped to a workspace
+                        var workspace = GetWorkspace(packageConfig);
+                        if (workspace != null) workspace.PendEdit(packageConfig);
+
+                        try
+                        {
+                            File.WriteAllText(packageConfig, content);
+                            fixCount++;
+                        }
+                        catch (Exception ex) { }
+                    }
+                }
+
+                if (fixCount > 0)
+                    MessageBox.Show(String.Format("{0}/{1} config fixed !", fixCount, targetCount));
+            };
+            form.SetValue(referencedVersions.GetConflictingVersions());
+        }
+
+        private void MenuItemCallback_FixReferences(object sender, EventArgs e)
+        {
+            var dte = GetService(typeof(SDTE)) as DTE2;
+            if (!dte.Solution.IsOpen) return;
+
+            var projectsFixed = new List<String>();
+            var projectsFailed = new List<String>();
+
+            foreach (var proj in GetSolutionProjects(dte))
+            {
+                var fullpath = proj.FullName;
+
+                var projectContent = File.ReadAllText(fullpath);
+                if (regexVersionnedReferences.IsMatch(projectContent))
+                {
+                    // Checkout file if currently mapped to a workspace
+                    var workspace = GetWorkspace(fullpath);
+                    if (workspace != null) workspace.PendEdit(fullpath);
+
+                    var cleanContent = regexVersionnedReferences.Replace(projectContent, Settings.Default.RegexProjectReferenceReplace);
+                    try
+                    {
+                        File.WriteAllText(fullpath, cleanContent);
+                        projectsFixed.Add(Path.GetFileNameWithoutExtension(fullpath));
+                    }
+                    catch (Exception ex)
+                    {
+                        projectsFailed.Add(Path.GetFileNameWithoutExtension(fullpath));
+                    }
+                }
+            }
+
+            if (projectsFixed.Any() || projectsFailed.Any())
+            {
+                MessageBox.Show(
+                    projectsFixed.Aggregate("", (all, value) => all + String.Format("{0} fixed\n", value)) +
+                    projectsFailed.Aggregate("", (all, value) => all + String.Format("{0} failed\n", value))
+                );
+            }
+            else
+            {
+                MessageBox.Show("Nothing to fix", "Yeah !");
+            }
+
+            _workspace = null;
+        }
+
         #endregion
 
         #region Visual stuffs
@@ -257,6 +392,87 @@ namespace MrLuje.LazyPackagesCleaner
         uint cookie = 1;
 
         #endregion
+
+        private readonly Regex regexVersionnedReferences =
+            new Regex(Settings.Default.RegexProjectReferencePattern,
+                RegexOptions.Compiled & RegexOptions.IgnoreCase);
+        private readonly Regex regexPackageConfigContent =
+            new Regex(Settings.Default.RegexPackageConfigPackagePattern,
+                RegexOptions.Compiled & RegexOptions.IgnoreCase);
+
+        private Workspace _workspace;
+        private MenuCommand _menuCommandDeleteVersionned;
+        private MenuCommand _menuCommandDeleteAll;
+        private MenuCommand _menuCommandOpenPackages;
+        private MenuCommand _menuCommandFixReferences;
+        private MenuCommand _menuCommandFixPackagesConfig;
+
+        Workspace GetWorkspace(string file)
+        {
+            if (_workspace != null) return _workspace;
+
+            var workspaceInfo = Workstation.Current.GetLocalWorkspaceInfo(file);
+            if (workspaceInfo == null) return null;
+            var server = new TfsTeamProjectCollection(workspaceInfo.ServerUri);
+            return workspaceInfo.GetWorkspace(server);
+        }
+
+        List<Project> FindProjectRecurse(Project proj)
+        {
+            var projects = new List<Project>();
+            IEnumerable<ProjectItem> projectItems = proj.ProjectItems
+                .OfType<ProjectItem>()
+                .Where(p => p.Kind == EnvDTE.Constants.vsProjectItemKindSolutionItems ||
+                            p.Kind == EnvDTE.Constants.vsProjectKindSolutionItems)
+                .ToList();
+
+            if (proj.UniqueName.EndsWith("proj"))
+                projects.Add(proj);
+
+            foreach (var item in projectItems)
+            {
+                if (item.SubProject != null && item.SubProject.UniqueName.EndsWith("proj"))
+                {
+                    projects.Add(item.SubProject);
+                }
+                else if (item.SubProject != null)
+                {
+                    projects.AddRange(FindProjectRecurse(item.SubProject));
+                }
+            }
+
+            return projects;
+        }
+
+        private IEnumerable<String> GetSolutionPackagesConfig(DTE2 dte)
+        {
+            foreach (var mainProj in dte.Solution.Projects.OfType<Project>())
+            {
+                foreach (var proj in FindProjectRecurse(mainProj))
+                {
+                    foreach (var item in proj.ProjectItems.OfType<ProjectItem>())
+                    {
+                        if (item.Name.ToLower() == "packages.config")
+                        {
+                            yield return Path.Combine(Path.GetDirectoryName(proj.FullName), item.Name);
+                        }
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<Project> GetSolutionProjects(DTE2 dte)
+        {
+            var projectFiles = dte.Solution.Projects.OfType<Project>();
+
+            foreach (var projectFile in projectFiles)
+            {
+                foreach (var proj in FindProjectRecurse(projectFile))
+                {
+                    yield return proj;
+                }
+            }
+        }
 
         #region Delete methods
 

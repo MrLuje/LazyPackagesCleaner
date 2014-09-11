@@ -91,6 +91,28 @@
           <ToolTipText>Open package folder</ToolTipText>
         </Strings>
       </Button>
+      <Button guid="guidLazyPackagesCleanerCmdSet" id="cmdFixVersionnedReferences" priority="0x0103" type="Button">
+        <Parent guid="guidLazyPackagesCleanerCmdSet" id="MyMenuGroup" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <ButtonText>Fix projects references</ButtonText>
+          <CommandName>Fix projects references</CommandName>
+          <LocCanonicalName>lpc.FixProjectsReferences</LocCanonicalName>
+          <ToolTipText>Fix projects references</ToolTipText>
+        </Strings>
+      </Button>
+      <Button guid="guidLazyPackagesCleanerCmdSet" id="cmdFixPackagesConfig" priority="0x0104" type="Button">
+        <Parent guid="guidLazyPackagesCleanerCmdSet" id="MyMenuGroup" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <ButtonText>Fix packages config</ButtonText>
+          <CommandName>Fix packages config</CommandName>
+          <LocCanonicalName>lpc.FixPackageConfig</LocCanonicalName>
+          <ToolTipText>Fix packages config</ToolTipText>
+        </Strings>
+      </Button>
     </Buttons>
    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -123,6 +145,8 @@
       <IDSymbol name="cmdDeleteNonVersionned" value="0x0100" />
       <IDSymbol name="cmdDeleteAll" value="0x0200" />
       <IDSymbol name="cmdOpenPackages" value="0x0300" />
+      <IDSymbol name="cmdFixVersionnedReferences" value="0x0400" />
+      <IDSymbol name="cmdFixPackagesConfig" value="0x0500" />
     </GuidSymbol>
     
     

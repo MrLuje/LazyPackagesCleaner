@@ -11,5 +11,20 @@
     <Setting Name="DebugMode" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="RegexProjectReferencePattern" Type="System.String" Scope="User">
+      <Value Profile="(Default)">(.+)(CompanyName)([\.\w]+)(\.[0-9]+){3}(\\lib\\.+\.dll\&lt;/HintPath\&gt;)</Value>
+    </Setting>
+    <Setting Name="RegexProjectReferenceReplace" Type="System.String" Scope="User">
+      <Value Profile="(Default)">$1$2$3$5</Value>
+    </Setting>
+    <Setting Name="RegexPackageConfigPackagePattern" Type="System.String" Scope="User">
+      <Value Profile="(Default)">(id=")(?&lt;name&gt;[^"]*)(" version=")(?&lt;version&gt;[^"]*)(")</Value>
+    </Setting>
+    <Setting Name="RegexProjectReferenceProcessPattern" Type="System.String" Scope="User">
+      <Value Profile="(Default)">(&lt;reference include=")(CompanyName)[^,]*)[^"]*"</Value>
+    </Setting>
+    <Setting Name="RegexProjectReferenceProcessReplace" Type="System.String" Scope="User">
+      <Value Profile="(Default)">$1$2"</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
