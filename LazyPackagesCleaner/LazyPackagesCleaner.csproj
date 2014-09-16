@@ -145,12 +145,22 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Business\Commands\BaseCommand.cs" />
+    <Compile Include="Business\Commands\DeleteAllPackageCommand.cs" />
+    <Compile Include="Business\Commands\DeleteVersionnedPackageCommand.cs" />
+    <Compile Include="Business\Commands\FixPackageConfigCommand.cs" />
+    <Compile Include="Business\Commands\FixProjectReferenceCommand.cs" />
+    <Compile Include="Business\Commands\OpenPackageFolderCommand.cs" />
     <Compile Include="Business\FolderDeletor.cs" />
+    <Compile Include="Business\SolutionHelper.cs" />
+    <Compile Include="Business\TfsHelper.cs" />
     <Compile Include="GUI\SettingsTool.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Misc\Guids.cs" />
+    <Compile Include="Model\NugetPackages.cs" />
     <Compile Include="Model\PackageVersions.cs" />
+    <Compile Include="Model\SelectedVersion.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -171,7 +181,7 @@
     <Compile Include="ReferenceConflicts.Designer.cs">
       <DependentUpon>ReferenceConflicts.cs</DependentUpon>
     </Compile>
-    <Compile Include="Business\SolutionBuildDetector.cs" />
+    <Compile Include="Business\SolutionEventDetector.cs" />
     <Compile Include="Business\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -189,7 +199,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

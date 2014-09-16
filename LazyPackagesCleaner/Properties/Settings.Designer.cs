@@ -118,5 +118,17 @@ namespace MrLuje.LazyPackagesCleaner.Properties {
                 this["RegexProjectReferenceProcessReplace"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EnableFullPackageCleanOnFixConfig {
+            get {
+                return ((bool)(this["EnableFullPackageCleanOnFixConfig"]));
+            }
+            set {
+                this["EnableFullPackageCleanOnFixConfig"] = value;
+            }
+        }
     }
 }

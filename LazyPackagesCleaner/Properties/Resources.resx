@@ -129,4 +129,16 @@
   <data name="DeletionNonVersionnedFoldersStart" xml:space="preserve">
     <value>Deleting non-versionned folders...</value>
   </data>
+  <data name="FixingReferenceProgress" xml:space="preserve">
+    <value>Fixing references... ({0}/{1})</value>
+  </data>
+  <data name="FixingReferencesEnd" xml:space="preserve">
+    <value>Fixing references... done !</value>
+  </data>
+  <data name="FixingReferencesStart" xml:space="preserve">
+    <value>Fixing references...</value>
+  </data>
+  <data name="ListingSolutionProjects" xml:space="preserve">
+    <value>Listing all solution projects...</value>
+  </data>
 </root>

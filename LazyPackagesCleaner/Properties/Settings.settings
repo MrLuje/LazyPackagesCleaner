@@ -26,5 +26,8 @@
     <Setting Name="RegexProjectReferenceProcessReplace" Type="System.String" Scope="User">
       <Value Profile="(Default)">$1$2"</Value>
     </Setting>
+    <Setting Name="EnableFullPackageCleanOnFixConfig" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

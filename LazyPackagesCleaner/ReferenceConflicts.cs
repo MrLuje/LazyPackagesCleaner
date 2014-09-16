@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using MrLuje.LazyPackagesCleaner.Model;
 
 namespace MrLuje.LazyPackagesCleaner
 {
@@ -12,18 +13,22 @@ namespace MrLuje.LazyPackagesCleaner
             InitializeComponent();
         }
 
-        public void SetValue(Dictionary<String, List<String>> init)
+        public void SetValue(IEnumerable<PackageVersions> packageVersions)
         {
-            foreach (var keyValuePair in init)
+            var tt = new ToolTip();
+
+            foreach (var packageVersion in packageVersions)
             {
                 var lbl = new Label();
-                lbl.Text = keyValuePair.Key;
+                lbl.Text = packageVersion.PackageName;
                 flowLayoutPanel1.Controls.Add(lbl);
+
+                tt.SetToolTip(lbl, packageVersion.PackageName);
 
                 var clbVersions = new CheckedListBox();
                 clbVersions.CheckOnClick = true;
                 clbVersions.ItemCheck += clbVersions_ItemCheck;
-                foreach (var version in keyValuePair.Value.OrderBy(s => s))
+                foreach (var version in packageVersion.Versions.OrderBy(s => s))
                 {
                     clbVersions.Items.Add(version);
                 }
@@ -53,13 +58,13 @@ namespace MrLuje.LazyPackagesCleaner
         }
 
 
-        public event Action<List<Tuple<String, String>>> Confirmed;
+        public event Action<List<SelectedVersion>> Confirmed;
         
         private void btnValidate_Click(object sender, EventArgs e)
         {
             var name = "";
             var version = "";
-            var result = new List<Tuple<String, String>>();
+            var result = new List<SelectedVersion>();
             foreach (var ctrl in flowLayoutPanel1.Controls)
             {
                 if (ctrl is Label) name = ((Label)ctrl).Text;
@@ -67,7 +72,7 @@ namespace MrLuje.LazyPackagesCleaner
 
                 if (name != "" && version != "")
                 {
-                    result.Add(new Tuple<string, string>(name, version));
+                    result.Add(new SelectedVersion(name, version));
                     name = version = "";
                 }
             }

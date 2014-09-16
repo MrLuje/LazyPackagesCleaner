@@ -95,5 +95,41 @@ namespace MrLuje.LazyPackagesCleaner.Properties {
                 return ResourceManager.GetString("DeletionNonVersionnedFoldersStart", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fixing references... ({0}/{1}).
+        /// </summary>
+        internal static string FixingReferenceProgress {
+            get {
+                return ResourceManager.GetString("FixingReferenceProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fixing references... done !.
+        /// </summary>
+        internal static string FixingReferencesEnd {
+            get {
+                return ResourceManager.GetString("FixingReferencesEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fixing references....
+        /// </summary>
+        internal static string FixingReferencesStart {
+            get {
+                return ResourceManager.GetString("FixingReferencesStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing all solution projects....
+        /// </summary>
+        internal static string ListingSolutionProjects {
+            get {
+                return ResourceManager.GetString("ListingSolutionProjects", resourceCulture);
+            }
+        }
     }
 }

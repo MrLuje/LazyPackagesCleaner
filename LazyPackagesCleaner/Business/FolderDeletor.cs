@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace MrLuje.LazyPackagesCleaner
+namespace MrLuje.LazyPackagesCleaner.Business
 {
     public class FolderDeletor
     {
