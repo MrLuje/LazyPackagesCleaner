@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using Microsoft.TeamFoundation.Framework.Client;
 
 namespace MrLuje.LazyPackagesCleaner.Business
 {
@@ -10,9 +12,15 @@ namespace MrLuje.LazyPackagesCleaner.Business
         public static string FindPackageFolder(string nugetConfigPath, string solutionFolder)
         {
             if (!String.IsNullOrEmpty(nugetConfigPath))
-                return ReadPathFromNugetFile(nugetConfigPath);
+            {
+                var nugetPath = ReadPathFromNugetFile(nugetConfigPath);
+                if (!String.IsNullOrEmpty(nugetPath))
+                {
+                    return Path.Combine(Path.GetDirectoryName(nugetConfigPath), nugetPath);
+                }
+            }
 
-            string packageFolderTry = Path.Combine(solutionFolder, "packages");
+            var packageFolderTry = Path.Combine(solutionFolder, "packages");
             if (Directory.Exists(packageFolderTry)) return packageFolderTry;
 
             packageFolderTry = Path.Combine(solutionFolder, "..", "packages");
@@ -23,13 +31,20 @@ namespace MrLuje.LazyPackagesCleaner.Business
 
         public static string ReadPathFromNugetFile(string nugetConfigPath)
         {
-            var pathLine = File.ReadAllLines(nugetConfigPath)
-                               .First(l => l.Contains(_repositoriesConfig_element_repositorypath));
+            try
+            {
+                var configXml = XElement.Load(nugetConfigPath).Element("config").Element("add");
+                if (configXml.Attribute("key").Value.ToLower() == _repositoriesConfig_element_repositorypath)
+                {
+                    return configXml.Attribute("value").Value;
+                }
 
-            var regex = new Regex("(?<=value=\")(.)*\"");
-            var result = regex.Match(pathLine);
-
-            return "";
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
         }
 
         private const string _repositoriesConfig_FileName = "repositories.config";
