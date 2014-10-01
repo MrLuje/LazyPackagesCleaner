@@ -55,5 +55,14 @@ namespace MrLuje.LazyPackagesCleaner.Business
                 }
             }
         }
+
+        public static string FindPackageFolder(DTE2 dte)
+        {
+            var nugetConfigFile = dte.Solution.FindProjectItem("nuget.config");
+            var nugetConfigPath = nugetConfigFile != null ? nugetConfigFile.FileNames[1] : string.Empty;
+
+            var solutionFolder = Path.GetDirectoryName(dte.Solution.FullName);
+            return Utils.FindPackageFolder(nugetConfigPath, solutionFolder);
+        }
     }
 }

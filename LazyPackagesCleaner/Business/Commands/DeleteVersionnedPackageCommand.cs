@@ -30,11 +30,7 @@ namespace MrLuje.LazyPackagesCleaner.Business.Commands
         {
             if (!_dte.Solution.IsOpen) return;
 
-            var nugetConfigFile = _dte.Solution.FindProjectItem("nuget.config");
-            var nugetConfigPath = nugetConfigFile.FileNames[1];
-
-            var solutionFolder = Path.GetDirectoryName(_dte.Solution.FullName);
-            var packageFolder = Utils.FindPackageFolder(nugetConfigPath, solutionFolder);
+            var packageFolder = SolutionHelper.FindPackageFolder(_dte);
 
             if (!Utils.CheckForRepositoryConfig(packageFolder)) return;
 

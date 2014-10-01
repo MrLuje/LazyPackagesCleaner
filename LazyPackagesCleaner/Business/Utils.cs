@@ -52,6 +52,8 @@ namespace MrLuje.LazyPackagesCleaner.Business
 
         public static bool CheckForRepositoryConfig(string path)
         {
+            if (string.IsNullOrEmpty(path)) return false;
+
             return File.Exists(Path.Combine(path, _repositoriesConfig_FileName));
         }
     }

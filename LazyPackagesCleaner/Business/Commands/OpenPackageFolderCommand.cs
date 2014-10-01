@@ -20,13 +20,9 @@ namespace MrLuje.LazyPackagesCleaner.Business.Commands
         {
             if (!_dte.Solution.IsOpen) return;
 
-            var nugetConfigFile = _dte.Solution.FindProjectItem("nuget.config");
-            var nugetConfigPath = nugetConfigFile.FileNames[1];
+            var packageFolder = SolutionHelper.FindPackageFolder(_dte);
 
-            var solutionFolder = Path.GetDirectoryName(_dte.Solution.FullName);
-            var packageFolder = Utils.FindPackageFolder(nugetConfigPath, solutionFolder);
-
-            if (!string.IsNullOrEmpty(packageFolder))
+            if (Utils.CheckForRepositoryConfig(packageFolder))
                 System.Diagnostics.Process.Start(packageFolder);
         }
     }
